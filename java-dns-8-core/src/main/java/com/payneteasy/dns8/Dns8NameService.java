@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
 import static com.payneteasy.dns8.support.HostsFile.isEmpty;
@@ -24,20 +26,40 @@ public class Dns8NameService implements sun.net.spi.nameservice.NameService {
         }
         LOG.info("Loading hosts from file {}", hostsFilename);
         hostsCache = new HostsCache(new File(hostsFilename));
-        hostsCache.dump();
+        hostsCache.dump(LOG);
     }
 
     @Override
     public InetAddress[] lookupAllHostAddr(String aHost) throws UnknownHostException {
-        LOG.debug("lookupAllHostAddr: {}", aHost);
+        Optional<InetAddress[]> addresses = hostsCache.findHostAddresses(aHost);
 
-        return hostsCache.findHostAddresses(aHost)
-                .orElseThrow(() -> new UnknownHostException(aHost));
+        if (addresses.isPresent()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Found {} for {}", aHost, Arrays.asList(addresses.get()));
+            }
+            return addresses.get();
+        } else {
+            LOG.debug("Not found {}", aHost);
+            throw new UnknownHostException(aHost);
+        }
     }
 
     @Override
     public String getHostByAddr(byte[] addr) throws UnknownHostException {
-        LOG.debug("getHostByAddr: {}", addr);
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("getHostByAddr: {}", toIpAddress(addr));
+        }
         throw new UnknownHostException();
+    }
+
+    private static String toIpAddress(byte[] addr) {
+        StringBuilder sb = new StringBuilder();
+        if(addr != null) {
+            for (byte b : addr) {
+                sb.append(".");
+                sb.append(b);
+            }
+        }
+        return sb.toString();
     }
 }

@@ -6,7 +6,7 @@ Custom dns resolver for java 8 bases on hosts file
 
 File META-INF/services/sun.net.spi.nameservice.NameServiceDescriptor
 ```
-com.payneteasy.dns8.Dns8NameService
+com.payneteasy.dns8.Dns8NameServiceDescriptor
 ```
 
 ## How to configure
@@ -30,7 +30,7 @@ com.payneteasy.dns8.Dns8NameService
 </repositories>
 
 <dependency>
-    <groupId>com.payneteasy</groupId>
+    <groupId>com.payneteasy.java-dns-8</groupId>
     <artifactId>java-dns-8-core</artifactId>
     <version>1.0-1</version>
 </dependency>

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,7 +13,7 @@ public class HostsFile {
 
     public static List<HostAddress> loadHostsFile(File aFile) {
         if (!aFile.exists()) {
-            throw new IllegalStateException("File " + aFile.getAbsoluteFile() + " not found");
+            throw new ServiceConfigurationError("File " + aFile.getAbsoluteFile() + " not found");
         }
 
         try (Stream<String> lines = Files.lines(aFile.toPath())) {
@@ -22,7 +23,7 @@ public class HostsFile {
                     .map(HostsFile::toHostAddress)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot read hosts file from " + aFile.getAbsoluteFile());
+            throw new ServiceConfigurationError("Cannot read hosts file from " + aFile.getAbsoluteFile());
         }
     }
 
@@ -34,7 +35,7 @@ public class HostsFile {
                     .host(st.nextToken())
                     .build();
         } catch (Exception e) {
-            throw new IllegalStateException("Cannot parse line '" + aLine + "'", e);
+            throw new ServiceConfigurationError("Cannot parse line '" + aLine + "'", e);
         }
     }
 

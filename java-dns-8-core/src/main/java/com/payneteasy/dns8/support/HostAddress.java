@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ServiceConfigurationError;
 import java.util.StringTokenizer;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -22,7 +23,7 @@ public class HostAddress {
         try {
             return Inet4Address.getByAddress(ipToBytes(address));
         } catch (UnknownHostException e) {
-            throw new IllegalStateException("Cannot parse ip address " + address);
+            throw new ServiceConfigurationError("Cannot parse ip address " + address);
         }
     }
 

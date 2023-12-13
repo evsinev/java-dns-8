@@ -5,11 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Optional;
-import java.util.StringTokenizer;
+import java.util.ServiceConfigurationError;
 
 import static com.payneteasy.dns8.support.HostsFile.isEmpty;
 
@@ -22,9 +20,11 @@ public class Dns8NameService implements sun.net.spi.nameservice.NameService {
     public Dns8NameService() {
         String hostsFilename = System.getenv("HOSTS_FILE");
         if (isEmpty(hostsFilename)) {
-            throw new IllegalStateException("No env variable HOSTS_FILE");
+            throw new ServiceConfigurationError("No env variable HOSTS_FILE");
         }
+        LOG.info("Loading hosts from file {}", hostsFilename);
         hostsCache = new HostsCache(new File(hostsFilename));
+        hostsCache.dump();
     }
 
     @Override
@@ -33,16 +33,6 @@ public class Dns8NameService implements sun.net.spi.nameservice.NameService {
 
         return hostsCache.findHostAddresses(aHost)
                 .orElseThrow(() -> new UnknownHostException(aHost));
-    }
-
-    private byte[] ipToBytes(String aIp) {
-        StringTokenizer st  = new StringTokenizer(aIp, ".");
-        byte[]          buf = new byte[4];
-        buf[0] = (byte) Integer.parseInt(st.nextToken());
-        buf[1] = (byte) Integer.parseInt(st.nextToken());
-        buf[2] = (byte) Integer.parseInt(st.nextToken());
-        buf[3] = (byte) Integer.parseInt(st.nextToken());
-        return buf;
     }
 
     @Override

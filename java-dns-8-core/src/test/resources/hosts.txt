@@ -1,0 +1,7 @@
+# comment1
+1.2.1.1 host1 # comment2
+1.2.2.1 host1
+
+1.2.3.4 host4
+
+
